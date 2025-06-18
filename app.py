@@ -92,6 +92,7 @@ if __name__ == "__main__":
         nsjail_cmd = [
             'nsjail',
             '--mode', 'o',
+            '--time_limit', '30', 
             '--rlimit_as', '512', 
             '--rlimit_cpu', '100',      
             '--rlimit_fsize', '1024',    
