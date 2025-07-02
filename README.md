@@ -26,6 +26,25 @@ The service will be available at `http://localhost:8080`
 
 ### Testing the API
 
+**Note:** Google Cloud Run does not support the ``--privileged`` flag required by ``nsjail``, which prevents the ``/execute`` ``POST`` endpoint from working correctly in that environment. This is because nsjail relies on privileged features such as mount and dependency binding to keep the Docker image lightweight and to dynamically execute user-submitted scripts.
+
+To address this limitation, I deployed the service on AWS EC2, which supports privileged Docker containers. This allows the ``/execute`` endpoint to function correctly with full nsjail isolation and security features enabled.
+
+- ✅ The health check endpoint ``/health`` works correctly on both Cloud Run and EC2..
+- ❌ The ``/execute`` endpoint works only on EC2 due to the need for ``--privileged`` support
+
+#### Example cURL request (AWS EC2):
+
+```bash
+curl -X POST http://3.148.187.65:8080/execute \
+  -H "Content-Type: application/json" \
+  -d '{"script": "import os\nimport pandas as pd\nimport numpy as np\ndef main():\n    print(\"hello\")\n    a = 2\n    b = a + 3\n    return {\"status\": b}"}'
+```
+
+```bash
+curl http://3.148.187.65:8080/health
+```
+
 #### Example cURL request (local):
 
 ```bash
@@ -34,17 +53,18 @@ curl -X POST http://localhost:8080/execute \
   -d '{"script": "import os\nimport pandas as pd\nimport numpy as np\ndef main():\n    print(\"Hello\")\n    a = 2\n    b = a + 3\n    return {\"status\": b}"}'
 ```
 
+```bash
+curl http://localhost:8080/health
+```
+
+
 #### Example cURL request (Cloud Run):
 
 ```bash
-curl -X POST http://3.148.187.65:8080/execute \
+curl -X POST http://api-service-fz4rdzczxq-uc.a.run.app/execute \
   -H "Content-Type: application/json" \
   -d '{"script": "import os\nimport pandas as pd\nimport numpy as np\ndef main():\n    print(\"hello\")\n    a = 2\n    b = a + 3\n    return {\"status\": b}"}'
 ```
-
-**Note:** Google Cloud Run does not support the ``--privileged`` flag required by ``nsjail``, which prevents the ``/execute`` ``POST`` endpoint from working correctly in that environment. This is because nsjail relies on privileged features such as mount and dependency binding to keep the Docker image lightweight and to dynamically execute user-submitted scripts.
-- ✅ The health check endpoint ``/health`` works correctly on Cloud Run.
-- ❌ The ``/execute`` endpoint does not due to the lack of privileged container support.
 
 ```bash
 curl https://api-service-fz4rdzczxq-uc.a.run.app/health     
