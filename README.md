@@ -37,7 +37,7 @@ curl -X POST http://localhost:8080/execute \
 #### Example cURL request (Cloud Run):
 
 ```bash
-curl -X POST https://api-service-fz4rdzczxq-uc.a.run.app/execute \
+curl -X POST http://3.148.187.65:8080/execute \
   -H "Content-Type: application/json" \
   -d '{"script": "import os\nimport pandas as pd\nimport numpy as np\ndef main():\n    print(\"hello\")\n    a = 2\n    b = a + 3\n    return {\"status\": b}"}'
 ```
